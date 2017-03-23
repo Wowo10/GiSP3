@@ -26,6 +26,8 @@ namespace GiSP3
 
             shape.Position = pos;
 
+            shape.Origin = new Vector2f(shape.GetGlobalBounds().Width / 2, shape.GetGlobalBounds().Height / 2);
+
             Font font= new Font("resources/fonts/Font.otf");
 
             if(font == null)
@@ -39,8 +41,14 @@ namespace GiSP3
             labelchar.CharacterSize = 30;
             labelchar.Color = new Color(255, 255, 255);
             labelchar.DisplayedString = label + ""; //one of reasons why c# isn`t cool language.
-            labelchar.Position = pos + new Vector2f(5,3); //magic number for positioning
+            labelchar.Position = pos + new Vector2f(-8,-10); //magic number for positioning
 
+            labelchar.Origin = new Vector2f(labelchar.GetGlobalBounds().Width / 2, labelchar.GetGlobalBounds().Height / 2);
+        }
+
+        public Vector2f Position
+        {
+            get { return shape.Position; }
         }
 
         public void Render(ref RenderWindow window)
