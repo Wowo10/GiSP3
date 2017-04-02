@@ -24,6 +24,27 @@ namespace GiSP3
             window.Close();
         }
 
+        static double Distance(Vector2f start, Vector2f stop) //not rly, only squares, cause sqr is expensive
+        {
+            double dist = (start.X - stop.X) * (start.X - stop.X) + (start.Y - stop.Y) * (start.Y - stop.Y);
+            //Console.WriteLine("("+start.X+", "+start.Y+"), ("+stop.X + ", " + stop.Y + "): "+dist); debug checking distance
+
+            return dist;
+        }
+
+        static bool CheckCollisions() //true for no collisions detected
+        {
+            foreach (var item in vertices)
+            {
+                if (Distance(item.Position, new Vector2f(
+                        Mouse.GetPosition(app).X, Mouse.GetPosition(app).Y)) < 4000) //if colliding with any
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         static void ButtonPress(object sender, EventArgs e)
         {
             if(Mouse.IsButtonPressed(Mouse.Button.Left))
@@ -31,9 +52,15 @@ namespace GiSP3
                 //Need to add checking for:
                 //Vertices collision (probably some distance between center and click for all vertices
                 //if user is clicking on existing vertex to click on it
-                if(counter != 'Z' + 1)
-                    vertices.Add(new Vertex(counter++, 
-                        new Vector2f(Mouse.GetPosition(app).X, Mouse.GetPosition(app).Y))); //Cheat to convert V2i to V2f
+                if (counter != 'Z' + 1)
+                {
+                    if (CheckCollisions())
+                    {
+                        vertices.Add(new Vertex(counter++, 
+                            new Vector2f(Mouse.GetPosition(app).X,
+                                Mouse.GetPosition(app).Y))); //Cheat to convert V2i to V2f
+                    }
+                }
             }
         }
 
