@@ -10,6 +10,7 @@ namespace GiSP3
     {
         // Create the main window
         static RenderWindow app = new RenderWindow(new VideoMode(800, 600), "Projekt 3 - FireWatch");
+        static bool exit = false;
 
         public static List<Vertex> vertices = new List<Vertex>(); //List of Vertices
         public static char counter = 'A'; //Counter for vertices` labels
@@ -22,30 +23,9 @@ namespace GiSP3
             // Close the window when OnClose event is received
             RenderWindow window = (RenderWindow)sender;
             window.Close();
-        }
+        }        
 
-        static double Distance(Vector2f start, Vector2f stop) //not rly, only squares, cause sqr is expensive
-        {
-            double dist = (start.X - stop.X) * (start.X - stop.X) + (start.Y - stop.Y) * (start.Y - stop.Y);
-            //Console.WriteLine("("+start.X+", "+start.Y+"), ("+stop.X + ", " + stop.Y + "): "+dist); debug checking distance
-
-            return dist;
-        }
-
-        static bool CheckCollisions() //true for no collisions detected
-        {
-            foreach (var item in vertices)
-            {
-                if (Distance(item.Position, new Vector2f(
-                        Mouse.GetPosition(app).X, Mouse.GetPosition(app).Y)) < 4000) //if colliding with any
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        static void ButtonPress(object sender, EventArgs e)
+        static void OnButtonPress(object sender, EventArgs e)
         {
             if(Mouse.IsButtonPressed(Mouse.Button.Left))
             {
@@ -64,15 +44,47 @@ namespace GiSP3
             }
         }
 
+        static void OnKeyPress(object sender, EventArgs e)
+        {
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
+                exit = true;
+            else if(Keyboard.IsKeyPressed(Keyboard.Key.F1))
+            {
+                Vertex.debug = !Vertex.debug;
+            }
+        }
+
+        static double Distance(Vector2f start, Vector2f stop) //not rly, only squares, cause sqr is expensive
+        {
+            double dist = (start.X - stop.X) * (start.X - stop.X) + (start.Y - stop.Y) * (start.Y - stop.Y);
+            //Console.WriteLine("(" + start.X + ", " + start.Y + "), (" + stop.X + ", " + stop.Y + "): " + dist);// debug checking distance
+
+            return dist;
+        }
+
+        static bool CheckCollisions() //true for no collisions detected
+        {
+            foreach (var item in vertices)
+            {
+                if (Distance(item.Position, new Vector2f(
+                        Mouse.GetPosition(app).X, Mouse.GetPosition(app).Y)) < 4000) //if colliding with any
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         static void Main()
         {            
             app.Closed += new EventHandler(OnClose);
-            app.MouseButtonPressed += new EventHandler<MouseButtonEventArgs>(ButtonPress);
+            app.MouseButtonPressed += new EventHandler<MouseButtonEventArgs>(OnButtonPress);
+            app.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPress);
 
             Color windowColor = new Color(50, 192, 255);
 
             // Start the main loop
-            while (app.IsOpen)
+            while (app.IsOpen && !exit)
             {
                 // Process events
                 app.DispatchEvents();
