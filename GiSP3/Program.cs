@@ -23,20 +23,24 @@ namespace GiSP3
             // Close the window when OnClose event is received
             RenderWindow window = (RenderWindow)sender;
             window.Close();
-        }        
+        }
+
+        enum Collision
+        {
+            NONE = 0,
+            CONTACT,
+            SELECT
+        }
 
         static void OnButtonPress(object sender, EventArgs e)
         {
-            if(Mouse.IsButtonPressed(Mouse.Button.Left))
+            if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
-                //Need to add checking for:
-                //Vertices collision (probably some distance between center and click for all vertices
-                //if user is clicking on existing vertex to click on it
                 if (counter != 'Z' + 1)
                 {
-                    if (CheckCollisions())
+                    if (CheckCollisions() == Collision.NONE)
                     {
-                        vertices.Add(new Vertex(counter++, 
+                        vertices.Add(new Vertex(counter++,
                             new Vector2f(Mouse.GetPosition(app).X,
                                 Mouse.GetPosition(app).Y))); //Cheat to convert V2i to V2f
                     }
@@ -48,9 +52,21 @@ namespace GiSP3
         {
             if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
                 exit = true;
-            else if(Keyboard.IsKeyPressed(Keyboard.Key.F1))
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F1))
             {
                 Vertex.debug = !Vertex.debug;
+            }
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F2))
+            {
+                Console.WriteLine("Edges: ");
+                foreach (var edge in edges)
+                {
+                    Console.WriteLine(edge.GetPair);
+                }
+            }
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F4))
+            {
+                Console.WriteLine("Mousepos: "+Mouse.GetPosition().X+", "+Mouse.GetPosition().Y);
             }
         }
 
@@ -62,21 +78,63 @@ namespace GiSP3
             return dist;
         }
 
-        static bool CheckCollisions() //true for no collisions detected
+        static Collision CheckCollisions() //true for no collisions detected
         {
             foreach (var item in vertices)
             {
-                if (Distance(item.Position, new Vector2f(
-                        Mouse.GetPosition(app).X, Mouse.GetPosition(app).Y)) < 4000) //if colliding with any
+                double distance = Distance(item.Position, new Vector2f(
+                        Mouse.GetPosition(app).X, Mouse.GetPosition(app).Y));
+                if (distance < 750)
                 {
-                    return false;
+                    if (currentselection == null)
+                    {
+                        item.Select();
+                        currentselection = item.Label;
+                    }
+                    else
+                    {
+                        foreach (var vertex in vertices)
+                        {
+                            vertex.Deselect();
+                        }
+
+                        Vector2f startpos = new Vector2f(0, 0);
+
+                        foreach (var vertex in vertices)
+                        {
+                            if (vertex.Label == currentselection)
+                            {
+                                startpos = vertex.Position;
+                                break;
+                            }
+                        }
+
+                        /*
+                        edges.Add(new Edge(new Edge.Pair(currentselection.Value, item.Label),
+                            new Vector2f((startpos.X + item.Position.X) / 2, (startpos.Y + item.Position.Y) / 2),
+                            Math.Sqrt(Distance(startpos, item.Position)),
+                            Math.Atan2(startpos.Y - item.Position.Y, startpos.X - item.Position.X))); //ArcTangens!
+
+                        Console.WriteLine("Start: (" + startpos.X + ", " + startpos.Y + ") Stop: (" + item.Position.X + ", " + item.Position.Y + ")");
+                        Console.WriteLine("a: " + (startpos.Y - item.Position.Y) + " b: " + (startpos.X - item.Position.X) + " atg: " + Math.Atan2(startpos.Y - item.Position.Y, startpos.X - item.Position.X));
+                        */
+
+                        edges.Add(new Edge(new Edge.Pair(currentselection.Value, item.Label), startpos, item.Position));
+
+                        currentselection = null;
+                    }
+                    return Collision.SELECT;
+                }
+                else if (distance < 4000) //if colliding with any
+                {
+                    return Collision.CONTACT;
                 }
             }
-            return true;
+            return Collision.NONE;
         }
 
         static void Main()
-        {            
+        {
             app.Closed += new EventHandler(OnClose);
             app.MouseButtonPressed += new EventHandler<MouseButtonEventArgs>(OnButtonPress);
             app.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPress);
@@ -93,15 +151,15 @@ namespace GiSP3
                 app.Clear(windowColor);
 
                 //Drawing edges
-                foreach (var item in edges)
+                foreach (var edge in edges)
                 {
-                    item.Render(ref app);
+                    edge.Render(ref app);
                 }
 
                 //Drawing Vertices
-                foreach (var item in vertices)
+                foreach (var vertex in vertices)
                 {
-                    item.Render(ref app);
+                    vertex.Render(ref app);
                 }
 
                 // Update the window
