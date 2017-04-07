@@ -30,9 +30,59 @@ namespace GiSP3
             get { return pair; }
         }
 
+        int length;
+        public int Lenght
+        {
+            get { return length; }
+        }
+
         RectangleShape shape;
 
         VertexArray line;
+
+        public void Look()
+        {
+            SFML.Graphics.Vertex[] temptab = new SFML.Graphics.Vertex[2];
+
+            for (uint i = 0; i < line.VertexCount; i++)
+            {
+                temptab[i] = line[i];
+            }
+
+            for (int i = 0; i < temptab.Length; i++)
+            {
+                temptab[i].Color = new Color(255, 127,0);
+            }
+
+            line.Clear();
+
+            foreach (var vertex in temptab)
+            {
+                line.Append(vertex);
+            }
+        }
+
+        public void UnLook()
+        {
+            SFML.Graphics.Vertex[] temptab = new SFML.Graphics.Vertex[2];
+
+            for (uint i = 0; i < line.VertexCount; i++)
+            {
+                temptab[i] = line[i];
+            }
+
+            for (int i = 0; i < temptab.Length; i++)
+            {
+                temptab[i].Color = new Color(255, 255, 255);
+            }
+
+            line.Clear();
+
+            foreach (var vertex in temptab)
+            {
+                line.Append(vertex);
+            }
+        }
 
         public Edge(Pair pair, Vector2f pos, double width, double rotationdegrees)
         {
@@ -59,7 +109,7 @@ namespace GiSP3
             */
         }
 
-        public Edge(Pair pair, Vector2f startpos, Vector2f stoppos)
+        public Edge(Pair pair, Vector2f startpos, Vector2f stoppos, int length = 1) //currently in use
         {
             this.pair = pair;
 
@@ -71,6 +121,8 @@ namespace GiSP3
             line.Append(new SFML.Graphics.Vertex(stoppos + new Vector2f(5, 5), new Color(255, 255, 255)));*/
 
             line.PrimitiveType = PrimitiveType.Lines;
+
+            this.length = length;
         }
 
         public void Render(ref RenderWindow window)

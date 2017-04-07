@@ -83,6 +83,18 @@ namespace GiSP3
             labelchar.Color = new Color(255, 255, 255);
         }
 
+        public void Look()
+        {
+            shape.OutlineColor = new Color(255, 127, 0);
+            labelchar.Color = new Color(255, 127, 0);
+        }
+
+        public void UnLook()
+        {
+            shape.OutlineColor = new Color(255, 255, 255);
+            labelchar.Color = new Color(255, 255, 255);
+        }
+
         public Vector2f Position
         {
             get { return center.Position; }
