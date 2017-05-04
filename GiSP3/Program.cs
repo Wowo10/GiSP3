@@ -21,6 +21,7 @@ namespace GiSP3
         public static uint currentlength = 1;
 
         public static bool searching = false;
+        public static bool after = false;
 
         static void OnClose(object sender, EventArgs e)
         {
@@ -40,7 +41,14 @@ namespace GiSP3
         {
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
-                if(!searching)
+                if (after)
+                {
+                    foreach (var vertex in vertices)
+                    {
+                        vertex.FireOff();
+                    }
+                }
+                if (!searching)
                     CheckCollisions(); //returning value in case if someone needs to read it
             }
         }
@@ -58,7 +66,7 @@ namespace GiSP3
                 Console.WriteLine("Edges: ");
                 foreach (var edge in edges)
                 {
-                    Console.WriteLine(edge.GetPair + " Length: "+ edge.Lenght);
+                    Console.WriteLine(edge.GetPair + " Length: " + edge.Lenght);
                 }
             }
             else if (Keyboard.IsKeyPressed(Keyboard.Key.F3)) //Writing Vertices
@@ -97,7 +105,7 @@ namespace GiSP3
                 counter = 'A';
 
                 Console.WriteLine("Cleared!");
-            }            
+            }
             else if (Keyboard.IsKeyPressed(Keyboard.Key.F8)) //Look all 
             {
                 foreach (var edge in edges)
@@ -200,9 +208,9 @@ namespace GiSP3
 
                         bool addedge = true;
 
-                        foreach(var edge in edges)
+                        foreach (var edge in edges)
                         {
-                            if(edge.GetPair.Contains(currentselection.Value) && edge.GetPair.Contains(item.Label))
+                            if (edge.GetPair.Contains(currentselection.Value) && edge.GetPair.Contains(item.Label))
                             {
                                 addedge = false;
                                 break;
@@ -280,7 +288,7 @@ namespace GiSP3
 
             foreach (var edge in edges)
             {
-                if(edge.Contains(vertexlabel))
+                if (edge.Contains(vertexlabel))
                 {
                     container.Add(edge.GetSecond(vertexlabel));
                 }
@@ -311,15 +319,15 @@ namespace GiSP3
                     return true;
                 }
             }
-            
+
             return false;
         }
 
         static char PopFirst(ref char[] tab)
         {
             char[] temp = new char[tab.Length - 1];
-            
-            for(int i = 0; i < temp.Length; i++)
+
+            for (int i = 0; i < temp.Length; i++)
             {
                 temp[i] = tab[i + 1];
             }
@@ -342,7 +350,7 @@ namespace GiSP3
 
                 for (int j = 0; j < tab.Length; j++)
                 {
-                    if(!IsInArray(temp, tab[j]) && FindVertex(tab[j]).Dist <= mindist)
+                    if (!IsInArray(temp, tab[j]) && FindVertex(tab[j]).Dist <= mindist)
                     {
                         mindist = FindVertex(tab[j]).Dist;
                         counter = FindVertex(tab[j]).Label;
@@ -408,13 +416,17 @@ namespace GiSP3
                 }
 
                 SortQueue(ref queue);
-            }            
+            }
         }
 
         struct VertexData
         {
             char label, prev;
             uint distance;
+            public uint Dist
+            {
+                get { return distance; }
+            }
             public VertexData(char label, char prev, uint distance)
             {
                 this.label = label;
@@ -473,39 +485,63 @@ namespace GiSP3
                     vertex.Render(ref app);
                 }
 
-                if(searching)
+                if (searching)
                 {
-                    if('A' == djikstracounter)
-                    {                        
+                    if ('A' == djikstracounter)
+                    {
                         foreach (var data in djikstradata)
                         {
                             data.Clear();
                         }
                         djikstradata.Clear();
+
                     }
                     else if (counter == djikstracounter)
                     {
+                        uint[] amounts = new uint[vertices.Count];
                         searching = false;
                         djikstracounter = 'A';
                         Console.WriteLine("Searching Done, Results:");
                         char counter = 'A';
                         foreach (var data in djikstradata)
                         {
-                            Console.Write("For "+counter++ +": ");
+                            uint sum = 0;
+                            Console.Write("For " + counter + ": ");
                             foreach (var vdata in data)
                             {
-                                Console.Write(vdata+" ");
+                                Console.Write(vdata + " ");
+                                sum += vdata.Dist;
                             }
-                            Console.Write("\n");
+                            Console.Write(" Sum: " + sum + "\n");
+                            amounts[counter++ - 'A'] = sum;
                         }
+
+                        uint min = uint.MaxValue;
+                        for (int i = 0; i < vertices.Count; i++) //finding min of sums
+                        {
+                            if (amounts[i] < min)
+                            {
+                                min = amounts[i];
+                            }
+                        }
+
+                        for (int i = 0; i < vertices.Count; i++) //if min then show it
+                        {
+                            if (amounts[i] == min)
+                            {
+                                vertices[i].FireOn();
+                            }
+                        }
+                        after = true;
+
                         continue;
                     }
 
                     Djikstra(djikstracounter);
                     djikstradata.Add(new List<VertexData>());
                     foreach (var vertex in vertices)
-                    {                        
-                        djikstradata[djikstracounter - 'A'].Add(new VertexData(vertex.Label,vertex.Prev,vertex.Dist));
+                    {
+                        djikstradata[djikstracounter - 'A'].Add(new VertexData(vertex.Label, vertex.Prev, vertex.Dist));
                     }
                     djikstracounter++;
                 }

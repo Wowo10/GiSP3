@@ -25,7 +25,30 @@ namespace GiSP3
             set { distance = value; }
         }
 
-        public static bool debug = false;
+        public static bool debug;
+
+        bool firewatch;
+
+        public void FireOn()
+        {
+            firewatch = true;
+
+            shape.OutlineColor = new Color(255, 0, 0);
+            labelchar.Color = new Color(255, 0, 0);
+            labelchar.DisplayedString = firewatchlabel + "";
+        }
+        public void FireOff()
+        {
+            firewatch = false;
+
+            shape.OutlineColor = new Color(255, 255, 255);
+            labelchar.Color = new Color(255, 255, 255);
+            labelchar.DisplayedString = label + "";
+        }
+
+        public static Color firewatchcolor;
+        public static char firewatchlabel;
+        public static Text firetext;
 
         //Debug Variables
         CircleShape center;
@@ -34,11 +57,20 @@ namespace GiSP3
         CircleShape shape;
         Text labelchar;
 
+        static Vertex()
+        {
+            debug = false;
+
+            firewatchcolor = new Color(255, 0, 0);
+            firewatchlabel = 'S';
+        }
+
         public Vertex(char label, Vector2f pos)
         {
             this.label = label;
             previous = '0';
             distance = uint.MaxValue;
+            firewatch = false;
 
             shape = new CircleShape(20);
 
