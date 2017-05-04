@@ -3,3 +3,6 @@
 *.exe
 *.cache
 GiSP3/obj/Debug/GiSP3.csproj.FileListAbsolute.txt
+*.manifest
+*.dll
+*GiSP3.csproj.FileListAbsolute.txt
