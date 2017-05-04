@@ -9,15 +9,16 @@ namespace GiSP3
     static class Program
     {
         // Create the main window
-        static RenderWindow app = new RenderWindow(new VideoMode(800, 600), "Projekt 3 - FireWatch");
+        static RenderWindow app = new RenderWindow(new VideoMode(800, 600), "Project 3 - FireWatch");
         static bool exit = false;
 
         public static List<Vertex> vertices = new List<Vertex>(); //List of Vertices
         public static char counter = 'A'; //Counter for vertices` labels
+        public static char djikstracounter = 'A';
 
         public static List<Edge> edges = new List<Edge>();
         public static char? currentselection = null;
-        public static int currentlength = 1;
+        public static uint currentlength = 1;
 
         public static bool searching = false;
 
@@ -65,20 +66,30 @@ namespace GiSP3
                 Console.WriteLine("Vertices: ");
                 foreach (var vertex in vertices)
                 {
-                    Console.Write(vertex.Label+" ");
+                    Console.Write(vertex.Label + " ");
                 }
                 Console.Write("\n");
             }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F4)) //Writing mousepos
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F4)) //Writing Vertices with properties
             {
-                Console.WriteLine("Mousepos: " + Mouse.GetPosition().X + ", " + Mouse.GetPosition().Y);
+                Console.WriteLine("Vertices: ");
+                foreach (var vertex in vertices)
+                {
+                    Console.WriteLine(vertex.Label + " Dist: " + vertex.Dist + " Prev: " + vertex.Prev);
+                }
+                Console.Write("\n");
             }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F5)) //Writing currents
+
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F5)) //Writing mousepos
+            {
+                Console.WriteLine("Mousepos: " + Mouse.GetPosition(app).X + ", " + Mouse.GetPosition(app).Y);
+            }
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F6)) //Writing currents
             {
                 Console.WriteLine("Current selection: " + currentselection +
                     ", Current lenght: " + currentlength + ", Searching: " + searching);
             }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F6)) //Clearing all
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F7)) //Clearing all
             {
                 vertices.Clear();
                 edges.Clear();
@@ -87,7 +98,7 @@ namespace GiSP3
 
                 Console.WriteLine("Cleared!");
             }            
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F7)) //Look all 
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F8)) //Look all 
             {
                 foreach (var edge in edges)
                 {
@@ -99,7 +110,7 @@ namespace GiSP3
                     vertex.Look();
                 }
             }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F8)) //UnLook all
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F9)) //UnLook all
             {
                 foreach (var edge in edges)
                 {
@@ -250,6 +261,189 @@ namespace GiSP3
             return Collision.NONE;
         }
 
+        // Djikstras sheets
+
+        static Vertex FindVertex(char label)
+        {
+            foreach (var vertex in vertices)
+            {
+                if (vertex.Label == label)
+                    return vertex;
+            }
+
+            return null;
+        }
+
+        static char[] FindNeighbours(char vertexlabel)
+        {
+            List<char> container = new List<char>();
+
+            foreach (var edge in edges)
+            {
+                if(edge.Contains(vertexlabel))
+                {
+                    container.Add(edge.GetSecond(vertexlabel));
+                }
+            }
+
+            return container.ToArray();
+        }
+
+        static uint GetLength(char first, char second)
+        {
+            foreach (var edge in edges)
+            {
+                if (edge.GetPair.Contains(first) && edge.GetPair.Contains(second))
+                {
+                    return edge.Lenght;
+                }
+            }
+
+            return 0;
+        }
+
+        static bool IsInArray(char[] tab, char findme)
+        {
+            foreach (var character in tab)
+            {
+                if (character == findme)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        static char PopFirst(ref char[] tab)
+        {
+            char[] temp = new char[tab.Length - 1];
+            
+            for(int i = 0; i < temp.Length; i++)
+            {
+                temp[i] = tab[i + 1];
+            }
+
+            char ret = tab[0];
+
+            tab = temp;
+
+            return ret;
+        }
+
+        static void SortQueue(ref char[] tab)
+        {
+            char[] temp = new char[tab.Length];
+
+            for (int i = 0; i < tab.Length; i++)
+            {
+                uint mindist = uint.MaxValue;
+                char counter = '0';
+
+                for (int j = 0; j < tab.Length; j++)
+                {
+                    if(!IsInArray(temp, tab[j]) && FindVertex(tab[j]).Dist <= mindist)
+                    {
+                        mindist = FindVertex(tab[j]).Dist;
+                        counter = FindVertex(tab[j]).Label;
+                    }
+                }
+                temp[i] = counter;
+            }
+
+            tab = temp;
+        }
+
+        static void Djikstra(char start)
+        {
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                if (vertices[i].Label == start)
+                    vertices[i].Dist = 0;
+                else
+                    vertices[i].Dist = uint.MaxValue;
+
+                vertices[i].Prev = '0';
+            }
+
+            char[] queue = new char[vertices.Count];
+
+            for (int i = 0; i < queue.Length; i++)
+            {
+                queue[i] = (char)('A' + i);
+            }
+
+            /*
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                uint mindist = uint.MaxValue;
+                char counter = '0';
+                for (int j = 0; j < vertices.Count; j++)
+                {
+                    if(!IsInArray(queue, vertices[j].Label) && vertices[j].Dist <= mindist)
+                    {  
+                         mindist = vertices[j].Dist;
+                         counter = vertices[j].Label;                       
+                    }
+                }
+                queue[i] = counter;
+            }*/
+
+            SortQueue(ref queue);
+
+            while (queue.Length != 0)
+            {
+                char u = PopFirst(ref queue);
+                Vertex current = FindVertex(u);
+
+                char[] neightbours = FindNeighbours(u);
+
+                for (int i = 0; i < neightbours.Length; i++)
+                {
+                    if (current.Dist != uint.MaxValue && FindVertex(neightbours[i]).Dist > current.Dist + GetLength(neightbours[i], u))
+                    {
+                        FindVertex(neightbours[i]).Dist = current.Dist + GetLength(neightbours[i], u);
+                        FindVertex(neightbours[i]).Prev = u;
+                    }
+                }
+
+                SortQueue(ref queue);
+            }            
+        }
+
+        struct VertexData
+        {
+            char label, prev;
+            uint distance;
+            public VertexData(char label, char prev, uint distance)
+            {
+                this.label = label;
+                this.prev = prev;
+                this.distance = distance;
+            }
+
+            public override string ToString()
+            {
+                string msg = label + ":(";
+
+                if (distance != uint.MaxValue)
+                    msg += distance;
+                else
+                    msg += "inf";
+
+                msg += "/";
+
+                if (prev != '0')
+                    msg += prev + ")";
+                else
+                    msg += "nil)";
+
+                return msg;
+            }
+        }
+
+        static List<List<VertexData>> djikstradata = new List<List<VertexData>>();
+
         static void Main()
         {
             app.Closed += new EventHandler(OnClose);
@@ -277,6 +471,43 @@ namespace GiSP3
                 foreach (var vertex in vertices)
                 {
                     vertex.Render(ref app);
+                }
+
+                if(searching)
+                {
+                    if('A' == djikstracounter)
+                    {                        
+                        foreach (var data in djikstradata)
+                        {
+                            data.Clear();
+                        }
+                        djikstradata.Clear();
+                    }
+                    else if (counter == djikstracounter)
+                    {
+                        searching = false;
+                        djikstracounter = 'A';
+                        Console.WriteLine("Searching Done, Results:");
+                        char counter = 'A';
+                        foreach (var data in djikstradata)
+                        {
+                            Console.Write("For "+counter++ +": ");
+                            foreach (var vdata in data)
+                            {
+                                Console.Write(vdata+" ");
+                            }
+                            Console.Write("\n");
+                        }
+                        continue;
+                    }
+
+                    Djikstra(djikstracounter);
+                    djikstradata.Add(new List<VertexData>());
+                    foreach (var vertex in vertices)
+                    {                        
+                        djikstradata[djikstracounter - 'A'].Add(new VertexData(vertex.Label,vertex.Prev,vertex.Dist));
+                    }
+                    djikstracounter++;
                 }
 
                 // Update the window

@@ -11,6 +11,20 @@ namespace GiSP3
             get { return label; }
         }
 
+        char previous;
+        public char Prev
+        {
+            get { return previous; }
+            set { previous = value; }
+        }
+
+        uint distance;
+        public uint Dist
+        {
+            get { return distance; }
+            set { distance = value; }
+        }
+
         public static bool debug = false;
 
         //Debug Variables
@@ -23,6 +37,8 @@ namespace GiSP3
         public Vertex(char label, Vector2f pos)
         {
             this.label = label;
+            previous = '0';
+            distance = uint.MaxValue;
 
             shape = new CircleShape(20);
 

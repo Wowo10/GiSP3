@@ -17,7 +17,15 @@ namespace GiSP3
             {
                 return start == test || stop == test;
             }
-
+            public char GetSecond(char test)
+            {
+                if (test == start)
+                    return stop;
+                else if (test == stop)
+                    return start;
+                else //Theres none
+                    return '0';
+            }
             public override string ToString()
             {
                 return "(" + start + ", " + stop + ")";
@@ -30,8 +38,18 @@ namespace GiSP3
             get { return pair; }
         }
 
-        int length;
-        public int Lenght
+        public bool Contains(char test)
+        {
+            return pair.Contains(test);
+        }
+
+        public char GetSecond(char test)
+        {
+            return pair.GetSecond(test);
+        }
+
+        uint length;
+        public uint Lenght
         {
             get { return length; }
         }
@@ -84,6 +102,7 @@ namespace GiSP3
             }
         }
 
+        //not used anymore - TODELETE PROBABLY
         public Edge(Pair pair, Vector2f pos, double width, double rotationdegrees)
         {
             this.pair = pair;
@@ -109,7 +128,7 @@ namespace GiSP3
             */
         }
 
-        public Edge(Pair pair, Vector2f startpos, Vector2f stoppos, int length = 1) //currently in use
+        public Edge(Pair pair, Vector2f startpos, Vector2f stoppos, uint length = 1) //currently in use
         {
             this.pair = pair;
 
