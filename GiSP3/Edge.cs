@@ -57,6 +57,7 @@ namespace GiSP3
         RectangleShape shape;
 
         VertexArray line;
+        Text lengthchar;
 
         public void Look()
         {
@@ -69,7 +70,7 @@ namespace GiSP3
 
             for (int i = 0; i < temptab.Length; i++)
             {
-                temptab[i].Color = new Color(255, 127,0);
+                temptab[i].Color = new Color(255, 127, 0);
             }
 
             line.Clear();
@@ -102,32 +103,6 @@ namespace GiSP3
             }
         }
 
-        //not used anymore - TODELETE PROBABLY
-        public Edge(Pair pair, Vector2f pos, double width, double rotationdegrees)
-        {
-            this.pair = pair;
-
-            shape = new RectangleShape(new Vector2f(5, (float)width));
-
-            shape.FillColor = new Color(255, 255, 255);
-
-            shape.Position = pos;
-
-            shape.Origin = new Vector2f(shape.GetGlobalBounds().Width / 2, shape.GetGlobalBounds().Height / 2);
-
-            shape.Rotation = (float)rotationdegrees;
-
-            //////////////////////////////////////////////////////////////
-
-            /*
-            temp = new VertexArray();
-            temp.Append(new SFML.Graphics.Vertex(new Vector2f(0, 0), new Color(255, 255, 0)));
-            temp.Append(new SFML.Graphics.Vertex(new Vector2f(400, 400), new Color(255, 255, 0)));
-
-            temp.PrimitiveType = PrimitiveType.Lines;
-            */
-        }
-
         public Edge(Pair pair, Vector2f startpos, Vector2f stoppos, uint length = 1) //currently in use
         {
             this.pair = pair;
@@ -142,6 +117,18 @@ namespace GiSP3
             line.PrimitiveType = PrimitiveType.Lines;
 
             this.length = length;
+
+            Font font = new Font("resources/fonts/Font1.ttf");
+
+            lengthchar = new Text();
+
+            lengthchar.Font = font;
+            lengthchar.CharacterSize = 25;
+            lengthchar.Color = new Color(0, 0, 0);
+            lengthchar.DisplayedString = length + "";
+            lengthchar.Position = new Vector2f((startpos.X + stoppos.X) / 2, (startpos.Y + stoppos.Y) / 2);
+
+            lengthchar.Origin = new Vector2f(lengthchar.GetGlobalBounds().Width / 2, lengthchar.GetGlobalBounds().Height / 2);
         }
 
         public void Render(ref RenderWindow window)
@@ -149,6 +136,7 @@ namespace GiSP3
             //window.Draw(shape);
 
             window.Draw(line);
+            window.Draw(lengthchar);
         }
 
     }

@@ -101,7 +101,7 @@ namespace GiSP3
 
             bounds.Position = pos;
 
-            Font font = new Font("resources/fonts/Font.otf");
+            Font font = new Font("resources/fonts/Font1.ttf");
 
             if (font == null)
             {
