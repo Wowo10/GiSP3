@@ -54,56 +54,10 @@ namespace GiSP3
             get { return length; }
         }
 
-        RectangleShape shape;
-
         VertexArray line;
         Text lengthchar;
 
-        public void Look()
-        {
-            SFML.Graphics.Vertex[] temptab = new SFML.Graphics.Vertex[2];
-
-            for (uint i = 0; i < line.VertexCount; i++)
-            {
-                temptab[i] = line[i];
-            }
-
-            for (int i = 0; i < temptab.Length; i++)
-            {
-                temptab[i].Color = new Color(255, 127, 0);
-            }
-
-            line.Clear();
-
-            foreach (var vertex in temptab)
-            {
-                line.Append(vertex);
-            }
-        }
-
-        public void UnLook()
-        {
-            SFML.Graphics.Vertex[] temptab = new SFML.Graphics.Vertex[2];
-
-            for (uint i = 0; i < line.VertexCount; i++)
-            {
-                temptab[i] = line[i];
-            }
-
-            for (int i = 0; i < temptab.Length; i++)
-            {
-                temptab[i].Color = new Color(255, 255, 255);
-            }
-
-            line.Clear();
-
-            foreach (var vertex in temptab)
-            {
-                line.Append(vertex);
-            }
-        }
-
-        public Edge(Pair pair, Vector2f startpos, Vector2f stoppos, uint length = 1) //currently in use
+        public Edge(Pair pair, Vector2f startpos, Vector2f stoppos, uint length = 1)
         {
             this.pair = pair;
 
@@ -111,8 +65,6 @@ namespace GiSP3
 
             line.Append(new SFML.Graphics.Vertex(startpos, new Color(255, 255, 255)));
             line.Append(new SFML.Graphics.Vertex(stoppos, new Color(255, 255, 255)));
-            /*line.Append(new SFML.Graphics.Vertex(startpos + new Vector2f(5, 5), new Color(255, 255, 255)));
-            line.Append(new SFML.Graphics.Vertex(stoppos + new Vector2f(5, 5), new Color(255, 255, 255)));*/
 
             line.PrimitiveType = PrimitiveType.Lines;
 
@@ -132,9 +84,7 @@ namespace GiSP3
         }
 
         public void Render(ref RenderWindow window)
-        {
-            //window.Draw(shape);
-
+        { 
             window.Draw(line);
             window.Draw(lengthchar);
         }

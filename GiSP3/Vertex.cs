@@ -27,20 +27,14 @@ namespace GiSP3
 
         public static bool debug;
 
-        bool firewatch;
-
         public void FireOn()
         {
-            firewatch = true;
-
             shape.OutlineColor = new Color(255, 0, 0);
             labelchar.Color = new Color(255, 0, 0);
             labelchar.DisplayedString = firewatchlabel + "";
         }
         public void FireOff()
         {
-            firewatch = false;
-
             shape.OutlineColor = new Color(255, 255, 255);
             labelchar.Color = new Color(255, 255, 255);
             labelchar.DisplayedString = label + "";
@@ -70,7 +64,6 @@ namespace GiSP3
             this.label = label;
             previous = '0';
             distance = uint.MaxValue;
-            firewatch = false;
 
             shape = new CircleShape(20);
 
@@ -111,10 +104,10 @@ namespace GiSP3
             labelchar = new Text();
 
             labelchar.Font = font;
-            labelchar.CharacterSize = 30;
+            labelchar.CharacterSize = 40;
             labelchar.Color = new Color(255, 255, 255);
-            labelchar.DisplayedString = label + ""; //one of reasons why c# isn`t cool language.
-            labelchar.Position = pos + new Vector2f(-2, -8); //magic number for positioning
+            labelchar.DisplayedString = label + "";
+            labelchar.Position = pos + new Vector2f(-2, -12); //font offset
 
             labelchar.Origin = new Vector2f(labelchar.GetGlobalBounds().Width / 2, labelchar.GetGlobalBounds().Height / 2);
         }
@@ -126,18 +119,6 @@ namespace GiSP3
         }
 
         public void Deselect()
-        {
-            shape.OutlineColor = new Color(255, 255, 255);
-            labelchar.Color = new Color(255, 255, 255);
-        }
-
-        public void Look()
-        {
-            shape.OutlineColor = new Color(255, 127, 0);
-            labelchar.Color = new Color(255, 127, 0);
-        }
-
-        public void UnLook()
         {
             shape.OutlineColor = new Color(255, 255, 255);
             labelchar.Color = new Color(255, 255, 255);

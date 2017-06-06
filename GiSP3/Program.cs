@@ -57,11 +57,7 @@ namespace GiSP3
         {
             if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
                 exit = true;
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F1)) //Debug Mode
-            {
-                Vertex.debug = !Vertex.debug;
-            }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F2)) //Writing Edges
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F1)) //Writing Edges
             {
                 Console.WriteLine("Edges: ");
                 foreach (var edge in edges)
@@ -69,7 +65,7 @@ namespace GiSP3
                     Console.WriteLine(edge.GetPair + " Length: " + edge.Lenght);
                 }
             }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F3)) //Writing Vertices
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F2)) //Writing Vertices
             {
                 Console.WriteLine("Vertices: ");
                 foreach (var vertex in vertices)
@@ -78,26 +74,7 @@ namespace GiSP3
                 }
                 Console.Write("\n");
             }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F4)) //Writing Vertices with properties
-            {
-                Console.WriteLine("Vertices: ");
-                foreach (var vertex in vertices)
-                {
-                    Console.WriteLine(vertex.Label + " Dist: " + vertex.Dist + " Prev: " + vertex.Prev);
-                }
-                Console.Write("\n");
-            }
-
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F5)) //Writing mousepos
-            {
-                Console.WriteLine("Mousepos: " + Mouse.GetPosition(app).X + ", " + Mouse.GetPosition(app).Y);
-            }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F6)) //Writing currents
-            {
-                Console.WriteLine("Current selection: " + currentselection +
-                    ", Current lenght: " + currentlength + ", Searching: " + searching);
-            }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F7)) //Clearing all
+            else if (Keyboard.IsKeyPressed(Keyboard.Key.F3)) //Clearing all
             {
                 vertices.Clear();
                 edges.Clear();
@@ -106,31 +83,6 @@ namespace GiSP3
 
                 Console.WriteLine("Cleared!");
             }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F8)) //Look all 
-            {
-                foreach (var edge in edges)
-                {
-                    edge.Look();
-                }
-
-                foreach (var vertex in vertices)
-                {
-                    vertex.Look();
-                }
-            }
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.F9)) //UnLook all
-            {
-                foreach (var edge in edges)
-                {
-                    edge.UnLook();
-                }
-
-                foreach (var vertex in vertices)
-                {
-                    vertex.UnLook();
-                }
-            }
-
 
             else if (Keyboard.IsKeyPressed(Keyboard.Key.Return)) //starting search
             {
@@ -181,12 +133,11 @@ namespace GiSP3
         static double Distance(Vector2f start, Vector2f stop) //not rly, only squares, cause sqr is expensive
         {
             double dist = (start.X - stop.X) * (start.X - stop.X) + (start.Y - stop.Y) * (start.Y - stop.Y);
-            //Console.WriteLine("(" + start.X + ", " + start.Y + "), (" + stop.X + ", " + stop.Y + "): " + dist);// debug checking distance
 
             return dist;
         }
 
-        static Collision CheckCollisions() //true for no collisions detected
+        static Collision CheckCollisions()
         {
             foreach (var item in vertices)
             {
@@ -229,20 +180,6 @@ namespace GiSP3
                                     break;
                                 }
                             }
-
-                            /* Crappy code, uncommenting on own risk
-
-                            edges.Add(new Edge(new Edge.Pair(currentselection.Value, item.Label),
-                                new Vector2f((startpos.X + item.Position.X) / 2, (startpos.Y + item.Position.Y) / 2),
-                                Math.Sqrt(Distance(startpos, item.Position)),
-                                Math.Atan2(startpos.Y - item.Position.Y, startpos.X - item.Position.X))); //ArcTangens!
-
-                            Console.WriteLine("Start: (" + startpos.X + ", " + startpos.Y + ") Stop: (" + item.Position.X + ", " + item.Position.Y + ")");
-                            Console.WriteLine("a: " + (startpos.Y - item.Position.Y) + " b: " + (startpos.X - item.Position.X) + " atg: " + Math.Atan2(startpos.Y - item.Position.Y, startpos.X - item.Position.X));
-                            */
-
-
-
 
                             edges.Add(new Edge(new Edge.Pair(currentselection.Value, item.Label), startpos, item.Position, currentlength));
 
@@ -381,22 +318,6 @@ namespace GiSP3
                 queue[i] = (char)('A' + i);
             }
 
-            /*
-            for (int i = 0; i < vertices.Count; i++)
-            {
-                uint mindist = uint.MaxValue;
-                char counter = '0';
-                for (int j = 0; j < vertices.Count; j++)
-                {
-                    if(!IsInArray(queue, vertices[j].Label) && vertices[j].Dist <= mindist)
-                    {  
-                         mindist = vertices[j].Dist;
-                         counter = vertices[j].Label;                       
-                    }
-                }
-                queue[i] = counter;
-            }*/
-
             SortQueue(ref queue);
 
             while (queue.Length != 0)
@@ -501,18 +422,15 @@ namespace GiSP3
                         uint[] amounts = new uint[vertices.Count];
                         searching = false;
                         djikstracounter = 'A';
-                        Console.WriteLine("Searching Done, Results:");
+                        Console.WriteLine("Searching Done!");
                         char counter = 'A';
                         foreach (var data in djikstradata)
                         {
                             uint sum = 0;
-                            Console.Write("For " + counter + ": ");
                             foreach (var vdata in data)
                             {
-                                Console.Write(vdata + " ");
                                 sum += vdata.Dist;
                             }
-                            Console.Write(" Sum: " + sum + "\n");
                             amounts[counter++ - 'A'] = sum;
                         }
 
@@ -546,10 +464,8 @@ namespace GiSP3
                     djikstracounter++;
                 }
 
-                // Update the window
                 app.Display();
-            } //End game loop
-        } //End Main()
-
+            } 
+        } 
     }
 }
